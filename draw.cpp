@@ -25,6 +25,8 @@ Uint32 get_pixel32(SDL_Surface *surface, int x, int y)
 	Uint32 *pixels = (Uint32 *)surface->pixels;
 	return pixels[(y * surface->w) + x];
 }
+
+//Draws right polygon with fixed amount of sides.
 void drawFigure(double c, double b, int color, int sides, SDL_Surface *s)
 {
 	int coefficient = 1;
@@ -40,6 +42,7 @@ void drawFigure(double c, double b, int color, int sides, SDL_Surface *s)
 			vector1 = vector2;
 		}
 }
+//Draw line with method of Bresenham.
 void lineBresenham(SDL_Surface *s, int x1, int y1, int x2, int y2, int color){
 	const int dX = abs(x2 - x1);
 	const int dY = abs(y2 - y1);
@@ -65,6 +68,7 @@ void lineBresenham(SDL_Surface *s, int x1, int y1, int x2, int y2, int color){
 	}
 }
 
+//Agile modification of current angle to make no "spaces" between lines with complexity growth.
 double calculateAngle(int amountOfAngles, double distanceToCentre, double alpha) {
 	double beta = M_PI * (amountOfAngles - 2) / amountOfAngles - 0.01;
 	double discriminant = (2 * distanceToCentre*(1 + cos(beta)))*(2 * distanceToCentre*(1 + cos(beta))) - (distanceToCentre*distanceToCentre * 8 * (1-(alpha*alpha)) * (1 + cos(beta)));
@@ -73,6 +77,7 @@ double calculateAngle(int amountOfAngles, double distanceToCentre, double alpha)
 	return alpha2;
 }
 
+// Affine transformations based on current arguments.
 Matrix transformation(information information) {
 	double xz = information.alphaY / 57.3;    // Fi/(1Rad)
 	double yz = information.alphaX / 57.3;
@@ -104,19 +109,16 @@ Matrix transformation(information information) {
 	return xzRotationMatrix.multiply(yzRotationMatrix).multiply(xyRotationMatrix).multiply(scalingMatrix);
 }
 
+// Part of program which makes a query to functions required to finally draw figure.
 void draw(SDL_Surface *s, information information)
 {
 	for (int i = 0; i < 640; i++)
-	{
-		for (int w = 0; w < 480; w++)
-		{
-			put_pixel32(s, i, w, RGB(0,0,0));
-		}
-	}
+		for (int w = 0; w < 480; w++)	{put_pixel32(s, i, w, RGB(0,0,0));}
+	
 	matrixTransformation = transformation(information);
 	
 	int color = RGB(170, 120, 90), sides = information.sidesCount;
-	// Agile modification of current angle to make no "spaces" between lines with complexity growth.
+
 	double alphaCurrent = 0, distanceToCentre = 224;
 	double alpha = calculateAngle(sides, distanceToCentre, sin(information.angle));
 	for (int i = 1; i <= amount; i++)
